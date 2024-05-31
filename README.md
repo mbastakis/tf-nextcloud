@@ -1,93 +1,96 @@
-# Nextcloud AWS IaC
+# Terraform template to install the Nextcloud application in AWS
 
+This template for Terraform 0.12 installs and configures the latest Nextcloud version along with its dependencies. The configuration uses a MySql RDS instance as database and a S3 bucket as datastore.
+  
+## Features
 
+* S3 remote backend
 
-## Getting started
+### Network
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+* Custom Virtual Private Cloud (VPC)
+* Public and private subnets
+* Internet gateway and custom route table
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+### Nextcloud application
 
-## Add your files
+* AWS EC2 instance (t3.micro by default)
+* AWS AMI (Ubuntu 18.04 LTS)
+* Internet facing (Public subnet)
+* Elastic IP associated
+* Security group to allow access the Nextcloud UI
+* IAM user which only have permissions to connect to the S3 datastore
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+### Nextcloud database
 
+* RDS for MySql instance (db.t3.micro by default)
+* Private subnet
+* Security group to allow only access from the Nextcloud app EC2 instance
+
+### Nextcloud datastore
+
+* Data stored in a S3 bucket
+* Encryption enabled
+* Bucket policy to allow access only to the Nextcloud application IAM user
+
+## How to use
+
+The templates are preconfigured to use S3 as backend and uses partial configuration to decouple the initialization configuration. To configure the backend, fill the `s3_backend_config.hcl` file and run:
+
+```bash
+terraform init -backend-config=s3_backend_config.hcl
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/devops-projects9873022/nextcloud-aws/nextcloud-aws-iac.git
-git branch -M main
-git push -uf origin main
+
+In case you don't want to use the S3 backend, initialize Terraform in the following manner:
+
+```bash
+terraform init -backend=false
 ```
 
-## Integrate with your tools
+After the initialization, run `terraform plan` to check wich changes will be applied once the generated execution plan is applied:
 
-- [ ] [Set up project integrations](https://gitlab.com/devops-projects9873022/nextcloud-aws/nextcloud-aws-iac/-/settings/integrations)
+```bash
+terraform plan --out=nextcloud.tfplan
+```
 
-## Collaborate with your team
+Apply the Terraform plan
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+```bash
+terraform apply nextcloud.tfplan
+```
 
-## Test and Deploy
+It takes around **5 minutes** for Nextcloud to be ready to use since Terraform successfully applies the execution plan.
 
-Use the built-in continuous integration in GitLab.
+## Configuration
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+These variables can be changed in the `variables.tf` file.
 
-***
+| Variable | Default value | Description |
+|----------|---------------|-------------|
+| admin_user |  | Nextcloud admin user |
+| admin_pass |  | Nextcloud admin password |
+| db_user |  | Nextcloud database root user |
+| db_pass |  | Nextcloud database root password
+| aws_region | eu-south-1 | Region where to deploy the Nextcloud application and the database |
+| nextcloud_instance_type | t3.micro | SSH key name to associate to the Nextcloud app instance |
+| nextcloud_key_name | null | SSH key name to associate to the Nextcloud app instance |
+| db_instance_type | db.t3.micro | Database instance type |
+| vpc_cidr | 10.0.0.0/16 | CIDR of the VPC |
+| nextcloud_cidr | 10.0.1.0/24 | CIDR of the public subnet |
+| db_cidr | 10.0.2.0/24 | CIDR of the private subnet |
+| s3_bucket_name | highly-available-nextcloud-aws-2-loukas | Name of the S3 bucket to use as datastore |
+| force_datastore_destroy | false | Destroy all objects so that the bucket can be destroyed without error. These objects are not recoverable |
 
-# Editing this README
+## Outputs
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+| Name | Description |
+|------|-------------|
+| public_ip | Nextcloud application public IP |
+| public_dns | Nextcloud application public DNS |
 
-## Suggestions for a good README
+## TODO
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+* Implement HA using AutoScaling groups + Elastic LoadBalancer
+* Install Redis service to implement session storage
+* Add ELB health check URL for the Nextcloud application
+* Let's Encrypt SSL certificate for the Nextcloud application
