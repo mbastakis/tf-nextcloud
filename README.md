@@ -97,10 +97,33 @@ These variables can be changed in the `variables.tf` file.
 
 ## Documentation
 
+### Diagram generation
+
 Generate diagram from terraform: https://hieven.github.io/terraform-visual/
 
 ```
  terraform plan -out=plan.out
 
  terraform show -json plan.out > plan.json
+```
+
+### Git conventions
+
+#### Commit Types
+- **feat**: Commits that add or remove a new feature
+- **fix**: Commits that fix a bug
+- **refactor**: Commits that rewrite/restructure code, but do not change any API behavior
+- **perf**: Commits that improve performance
+- **style**: Commits that do not affect the meaning (white-space, formatting, missing semi-colons, etc.)
+- **test**: Commits that add missing tests or correct existing tests
+- **docs**: Commits that affect documentation only
+- **build**: Commits that affect build components like build tool, CI pipeline, dependencies, project version, etc.
+- **ops**: Commits that affect operational components like infrastructure, deployment, backup, recovery, etc.
+- **chore**: Miscellaneous commits e.g. modifying .gitignore
+
+#### Commit message
+```
+<type>(<optional scope>): <short description in present tense>
+<optional body>
+<optional footer>
 ```
