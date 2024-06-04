@@ -94,3 +94,13 @@ These variables can be changed in the `variables.tf` file.
 * Install Redis service to implement session storage
 * Add ELB health check URL for the Nextcloud application
 * Let's Encrypt SSL certificate for the Nextcloud application
+
+## Documentation
+
+Generate diagram from terraform: https://hieven.github.io/terraform-visual/
+
+```
+ terraform plan -out=plan.out
+
+ terraform show -json plan.out > plan.json
+```
