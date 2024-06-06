@@ -74,7 +74,7 @@ variable "admin_pass" {
 
 variable "s3_bucket_name" {
   description = "Name of the S3 bucket to use as datastore"
-  default = "highly-available-nextcloud-aws-2-loukas"
+  default = "highly-available-nextcloud-aws-datastore01"
 }
 
 variable "force_datastore_destroy" {

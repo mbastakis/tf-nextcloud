@@ -59,6 +59,12 @@ Apply the Terraform plan
 terraform apply nextcloud.tfplan
 ```
 
+Cleanup
+
+```
+terraform destroy -auto-approve
+```
+
 It takes around **5 minutes** for Nextcloud to be ready to use since Terraform successfully applies the execution plan.
 
 ## Configuration
