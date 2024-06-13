@@ -27,7 +27,7 @@ module "vpc" {
   private_subnet_suffix    = "${var.name}-private"
   database_subnet_suffix   = "${var.name}-db"
 
-  create_database_subnet_group  = false
+  create_database_subnet_group  = true
   manage_default_network_acl    = false
   manage_default_route_table    = false
   manage_default_security_group = false
@@ -151,18 +151,3 @@ data "aws_iam_policy_document" "generic_endpoint_policy" {
   }
 }
 
-resource "aws_security_group" "rds" {
-  name_prefix = "${var.name}-rds"
-  description = "Allow PostgreSQL inbound traffic"
-  vpc_id      = module.vpc.vpc_id
-
-  ingress {
-    description = "TLS from VPC"
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = [module.vpc.vpc_cidr_block]
-  }
-
-  tags = local.tags
-}

@@ -15,3 +15,16 @@ variable "vpc_cidr" {
   type        = string
   default     = "10.0.0.0/16"
 }
+
+
+variable "db_username" {
+  description = "The username for the RDS instance"
+  type        = string
+  default     = "admin"
+}
+
+variable "db_password" {
+  description = "The password for the RDS instance"
+  type        = string
+  default     = "password123password"
+}
