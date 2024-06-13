@@ -1,10 +1,10 @@
-output "eip_public_ip" {
-  value = aws_eip.ip.public_ip
-}
+# output "eip_public_ip" {
+#   value = aws_eip.ip.public_ip
+# }
 
-output "eip_public_dns" {
-  value = aws_eip.ip.public_dns
-}
+# output "eip_public_dns" {
+#   value = aws_eip.ip.public_dns
+# }
 
 output "vpc_id" {
   value = aws_vpc.nextcloud_vpc.id

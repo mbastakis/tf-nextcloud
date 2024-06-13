@@ -1,6 +1,6 @@
-variable "instance_id" {
-    description = "Instance id to assign the Elastic IP to"
-}
+# variable "instance_id" {
+#     description = "Instance id to assign the Elastic IP to"
+# }
 variable "vpc_cidr" {
   description = "CIDR of the VPC"
 }
