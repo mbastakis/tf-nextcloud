@@ -3,6 +3,11 @@ variable "name" {
   type        = string
 }
 
+variable "db_name" {
+    description = "The name of the database"
+    type        = string
+}
+
 variable "region" {
     description = "The region in which the RDS instance will be created"
     type        = string
@@ -38,10 +43,7 @@ variable "db_subnet_group_name" {
     type        = string
 }
 
-variable "security_group_rules" {
-    description = "The security group rules for the VPC endpoints"
-    type        = map(object({
-        description = string
-        cidr_blocks = list(string)
-    }))
+variable "vpc_security_group_ids" {
+    description = "The security group IDs for the RDS instance"
+    type        = list(string)
 }

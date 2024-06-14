@@ -18,6 +18,7 @@ module "aurora_postgresql_v2" {
   source = "terraform-aws-modules/rds-aurora/aws"
 
   name              = "${var.name}-postgresqlv2"
+  database_name     = var.db_name
   engine            = data.aws_rds_engine_version.postgresql.engine
   engine_mode       = "provisioned"
   engine_version    = data.aws_rds_engine_version.postgresql.version
@@ -27,9 +28,10 @@ module "aurora_postgresql_v2" {
   manage_master_user_password = false
   master_password   = var.db_password
 
-  vpc_id               = var.vpc_id
-  db_subnet_group_name = var.db_subnet_group_name
-  security_group_rules = var.security_group_rules
+  vpc_id                = var.vpc_id
+  vpc_security_group_ids = var.vpc_security_group_ids
+  db_subnet_group_name  = var.db_subnet_group_name
+  create_security_group = false
 
   apply_immediately   = true
   skip_final_snapshot = true

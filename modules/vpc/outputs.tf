@@ -8,12 +8,17 @@ output "database_subnet_group_name" {
     value = module.vpc.database_subnet_group_name
 }
 
-output "db_security_group_rules" {
-    description = "The security group rules for the VPC endpoints"
-    value = module.vpc_endpoints.endpoints.rds.security_group_rules
+output "db_security_group_ids" {
+    description = "The security group IDs for the RDS instance"
+    value = [aws_security_group.rds.id]
 }
 
 output "azs" {
     description = "The availability zones in which the RDS instance will be created"
     value = module.vpc.azs
+}
+
+output "public_subnets" {
+    description = "The public subnet IDs"
+    value = module.vpc.public_subnets
 }

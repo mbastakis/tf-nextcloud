@@ -151,3 +151,25 @@ data "aws_iam_policy_document" "generic_endpoint_policy" {
   }
 }
 
+resource "aws_security_group" "rds" {
+  name_prefix = "${var.name}-rds"
+  description = "Allow PostgreSQL inbound traffic"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    description = "TLS from VPC"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = [module.vpc.vpc_cidr_block]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = local.tags
+}

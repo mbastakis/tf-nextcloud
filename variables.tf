@@ -17,14 +17,38 @@ variable "vpc_cidr" {
 }
 
 
+variable "container_port" {
+  description = "The port of the container"
+  type        = number
+  default     = 80
+}
+
+variable "db_name" {
+  description = "The name of the database"
+  type        = string
+  default     = "nextcloudServerlessDB"
+}
+
 variable "db_username" {
   description = "The username for the RDS instance"
   type        = string
-  default     = "admin"
+  default     = "lukastheking"
 }
 
 variable "db_password" {
   description = "The password for the RDS instance"
+  type        = string
+  default     = "password123password"
+}
+
+variable "nextcloud_admin_user" {
+  description = "The admin user for Nextcloud"
+  type        = string
+  default     = "admin"
+}
+
+variable "nextcloud_admin_password" {
+  description = "The admin password for Nextcloud"
   type        = string
   default     = "password123password"
 }
