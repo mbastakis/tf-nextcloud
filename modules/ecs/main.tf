@@ -55,19 +55,6 @@ module "ecs_service" {
 
   # Container definition(s)
   container_definitions = {
-
-    fluent-bit = {
-      cpu       = 512
-      memory    = 1024
-      essential = true
-      image     = nonsensitive(data.aws_ssm_parameter.fluentbit.value)
-      firelens_configuration = {
-        type = "fluentbit"
-      }
-      memory_reservation = 50
-      user               = "0"
-    }
-
     (local.container_name) = {
       cpu       = 512
       memory    = 1024
@@ -84,37 +71,6 @@ module "ecs_service" {
 
       # Example image used requires access to write to root filesystem
       readonly_root_filesystem = false
-
-      dependencies = [{
-        containerName = "fluent-bit"
-        condition     = "START"
-      }]
-
-      enable_cloudwatch_logging = false
-      log_configuration = {
-        logDriver = "awsfirelens"
-        options = {
-          Name                    = "firehose"
-          region                  = var.region
-          delivery_stream         = "my-stream"
-          log-driver-buffer-limit = "2097152"
-        }
-      }
-
-      linux_parameters = {
-        capabilities = {
-          add = []
-          drop = [
-            "NET_RAW"
-          ]
-        }
-      }
-
-      # Not required for fluent-bit, just an example
-      volumes_from = [{
-        sourceContainer = "fluent-bit"
-        readOnly        = false
-      }]
 
       memory_reservation = 100
 
@@ -202,65 +158,8 @@ module "ecs_service" {
 }
 
 ################################################################################
-# Standalone Task Definition (w/o Service)
-################################################################################
-
-module "ecs_task_definition" {
-  source = "terraform-aws-modules/ecs/aws//modules/service"
-
-  # Service
-  name        = "${var.name}-standalone"
-  cluster_arn = module.ecs_cluster.arn
-
-  # Task Definition
-  volume = {
-    ex-vol = {}
-  }
-
-  runtime_platform = {
-    cpu_architecture        = "ARM64"
-    operating_system_family = "LINUX"
-  }
-
-  # Container definition(s)
-  container_definitions = {
-    al2023 = {
-      image = local.container_image
-
-      mount_points = [
-        {
-          sourceVolume  = "ex-vol",
-          containerPath = "/var/www/ex-vol"
-        }
-      ]
-
-      command    = ["echo hello world"]
-      entrypoint = ["/usr/bin/sh", "-c"]
-    }
-  }
-
-  subnet_ids = var.public_subnets
-
-  security_group_rules = {
-    egress_all = {
-      type        = "egress"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-  }
-
-  tags = local.tags
-}
-
-################################################################################
 # Supporting Resources
 ################################################################################
-
-data "aws_ssm_parameter" "fluentbit" {
-  name = "/aws/service/aws-for-fluent-bit/stable"
-}
 
 resource "aws_service_discovery_http_namespace" "this" {
   name        = var.name
