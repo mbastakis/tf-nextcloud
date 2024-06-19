@@ -26,7 +26,7 @@ variable "container_port" {
 variable "db_name" {
   description = "The name of the database"
   type        = string
-  default     = "nextcloudServerlessDB"
+  default     = "nextcloudserverlessdb"
 }
 
 variable "db_username" {

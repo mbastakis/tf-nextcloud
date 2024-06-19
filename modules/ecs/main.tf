@@ -18,6 +18,7 @@ module "ecs_cluster" {
   source = "terraform-aws-modules/ecs/aws//modules/cluster"
 
   cluster_name = "${var.name}-ecs-cluster"
+  create_task_exec_iam_role = true
 
   # Capacity provider
   fargate_capacity_providers = {
@@ -52,6 +53,9 @@ module "ecs_service" {
 
   # Enables ECS Exec
   enable_execute_command = true
+
+  # Assign public ip
+  assign_public_ip = true
 
   # Container definition(s)
   container_definitions = {
@@ -111,17 +115,17 @@ module "ecs_service" {
     }
   }
 
-  service_connect_configuration = {
-    namespace = aws_service_discovery_http_namespace.this.arn
-    service = {
-      client_alias = {
-        port     = local.container_port
-        dns_name = local.container_name
-      }
-      port_name      = local.container_name
-      discovery_name = local.container_name
-    }
-  }
+  # service_connect_configuration = {
+  #   namespace = aws_service_discovery_http_namespace.this.arn
+  #   service = {
+  #     client_alias = {
+  #       port     = local.container_port
+  #       dns_name = local.container_name
+  #     }
+  #     port_name      = local.container_name
+  #     discovery_name = local.container_name
+  #   }
+  # }
 
   load_balancer = {
     service = {
@@ -161,11 +165,11 @@ module "ecs_service" {
 # Supporting Resources
 ################################################################################
 
-resource "aws_service_discovery_http_namespace" "this" {
-  name        = var.name
-  description = "CloudMap namespace for ${var.name}"
-  tags        = local.tags
-}
+# resource "aws_service_discovery_http_namespace" "this" {
+#   name        = var.name
+#   description = "CloudMap namespace for ${var.name}"
+#   tags        = local.tags
+# }
 
 module "alb" {
   source  = "terraform-aws-modules/alb/aws"
