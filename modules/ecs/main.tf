@@ -57,6 +57,17 @@ module "ecs_service" {
   # Assign public ip
   assign_public_ip = true
 
+  # Volume
+  volume = {
+    efs-nextcloud = {
+      name = "efs-nextcloud"
+      efs_volume_configuration = {
+        file_system_id = var.efs_file_system_id
+        transit_encryption = "ENABLED"
+      }
+    }
+  }
+
   # Container definition(s)
   container_definitions = {
     (local.container_name) = {
@@ -111,6 +122,18 @@ module "ecs_service" {
           name = "OVERWRITEPROTOCOL"
           value = "https"
         },
+        {
+          name = "NEXTCLOUD_TRUSTED_DOMAINS"
+          value = module.alb.dns_name
+        }
+      ]
+      
+      mount_points = [
+        {
+          sourceVolume = "efs-nextcloud"
+          containerPath = "/var/www/html"
+          readOnly = false
+        }
       ]
     }
   }
@@ -223,7 +246,7 @@ module "alb" {
       health_check = {
         enabled             = true
         healthy_threshold   = 5
-        interval            = 30
+        interval            = 120
         matcher             = "200"
         path                = "/"
         port                = "traffic-port"

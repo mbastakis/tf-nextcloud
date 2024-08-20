@@ -57,3 +57,8 @@ variable nextcloud_admin_password {
     description = "The admin password for Nextcloud"
     type        = string
 }
+
+variable "efs_file_system_id" {
+    description = "The ID of the EFS file system"
+    type        = string
+}
