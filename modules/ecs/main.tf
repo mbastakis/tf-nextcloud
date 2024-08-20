@@ -119,12 +119,12 @@ module "ecs_service" {
           value = var.nextcloud_admin_password
         },
         {
-          name = "OVERWRITEPROTOCOL"
-          value = "https"
-        },
-        {
           name = "NEXTCLOUD_TRUSTED_DOMAINS"
           value = module.alb.dns_name
+        },
+        {
+          name = "OVERWRITEPROTOCOL"
+          value = "http"
         }
       ]
       
@@ -137,18 +137,6 @@ module "ecs_service" {
       ]
     }
   }
-
-  # service_connect_configuration = {
-  #   namespace = aws_service_discovery_http_namespace.this.arn
-  #   service = {
-  #     client_alias = {
-  #       port     = local.container_port
-  #       dns_name = local.container_name
-  #     }
-  #     port_name      = local.container_name
-  #     discovery_name = local.container_name
-  #   }
-  # }
 
   load_balancer = {
     service = {
