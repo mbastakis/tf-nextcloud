@@ -119,13 +119,18 @@ module "ecs_service" {
           value = var.nextcloud_admin_password
         },
         {
-          name = "NEXTCLOUD_TRUSTED_DOMAINS"
-          value = module.alb.dns_name
-        },
-        {
           name = "OVERWRITEPROTOCOL"
           value = "http"
-        }
+        },
+        # TODO: Need more testing to see if these are needed
+        # {
+        #   name = "OVERWRITEHOST"
+        #   value = module.alb.dns_name
+        # },
+        # {
+        #   name = "TRUSTED_PROXIES"
+        #   value = module.alb.dns_name
+        # }
       ]
       
       mount_points = [
@@ -175,12 +180,6 @@ module "ecs_service" {
 ################################################################################
 # Supporting Resources
 ################################################################################
-
-# resource "aws_service_discovery_http_namespace" "this" {
-#   name        = var.name
-#   description = "CloudMap namespace for ${var.name}"
-#   tags        = local.tags
-# }
 
 module "alb" {
   source  = "terraform-aws-modules/alb/aws"
