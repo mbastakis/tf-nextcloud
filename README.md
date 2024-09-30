@@ -1,5 +1,3 @@
-# TODO: transition this notes
-
 ## Useful commands
 
 ```shell
